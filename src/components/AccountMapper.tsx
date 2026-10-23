@@ -143,13 +143,19 @@ export function AccountMapper({ ctx, simplefinAccounts, initialMapping, initialL
               {wfAccounts.map((wf) => (
                 <option key={wf.id} value={wf.id}>{wf.name}</option>
               ))}
-              {loansOffered && loans && loans.length > 0 && (
-                <optgroup label="Loans (record the balance only)">
-                  {loans.map((l) => (
-                    <option key={l.id} value={LOAN_PREFIX + l.id}>{l.name}</option>
-                  ))}
-                </optgroup>
-              )}
+              {/* Until the companion reads loan links no loan is offered, but a
+                  row already linked keeps its own loan: without the option the
+                  select would show "— Select account —" for a live link. */}
+              {(() => {
+                const shown = (loans ?? []).filter((l) => loansOffered || l.id === loanLinks[sfin.id]);
+                return shown.length > 0 && (
+                  <optgroup label="Loans (record the balance only)">
+                    {shown.map((l) => (
+                      <option key={l.id} value={LOAN_PREFIX + l.id}>{l.name}</option>
+                    ))}
+                  </optgroup>
+                );
+              })()}
               <option value={CREATE_NEW_VALUE}>+ Create new account</option>
             </Select>
             {loanLinks[sfin.id] && !gone(sfin.id) && (

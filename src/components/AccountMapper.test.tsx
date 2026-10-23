@@ -141,6 +141,13 @@ describe('AccountMapper', () => {
     expect(onSave).toHaveBeenCalledWith({ 'ACT-chk': 'wf-chk' }, { 'ACT-loan': 'LIAB-1' });
   });
 
+  it('still shows the loan a row is linked to while loans are not offered', async () => {
+    render(<AccountMapper ctx={loanCtx()} simplefinAccounts={[servicer]} initialMapping={{}} initialLoanLinks={{ 'ACT-loan': 'LIAB-1' }}
+      companionVersion="1.67.1" onSave={vi.fn()} />);
+    await screen.findByRole('option', { name: 'Home Loan' });
+    expect((screen.getByRole('combobox') as HTMLSelectElement).value).toBe('loan:LIAB-1');
+  });
+
   it('offers no loans until the companion reads loan links', async () => {
     render(<AccountMapper ctx={loanCtx()} simplefinAccounts={[servicer]} initialMapping={{}} companionVersion="1.67.1" onSave={vi.fn()} />);
     await screen.findByRole('option', { name: 'Checking' });
